@@ -43,3 +43,11 @@ resource "aws_instance" "rabbitmq" {
 
   user_data = base64encode(templatefile("${path.module}/userdata.sh", {rabbitmq_appuser_password = data.aws_ssm_parameter.rabbitmq_appuser_password.value}))
 }
+
+resource "aws_route53_record" "main" {
+  zone_id = var.domain_id
+  name    = "rabbitmq-${var.env}"
+  type    = "A"
+  ttl     = 30
+  records = [aws_instance.rabbitmq.private_ip]
+}
